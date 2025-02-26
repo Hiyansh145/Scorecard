@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Intense Scoreboard 🔥</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            background: radial-gradient(circle, #000428, #004e92);
+            color: #ecf0f1;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            padding: 15px 30px;
+            border-radius: 15px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            box-shadow: 0px 5px 20px rgba(255, 0, 255, 0.5);
+        }
+
+        table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(255, 105, 180, 0.4);
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.1em;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .round-header {
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 1.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 3px solid #ff5c00;
+        }
+
+        .round-border {
+            border: 3px solid #ff5c00 !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        td input {
+            width: 50px;
+            text-align: center;
+            font-size: 18px;
+            padding: 6px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        button {
+            margin: 20px;
+            padding: 16px 35px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ff5c00, #ff00ff);
+            color: white;
+            font-weight: bold;
+            transition: 0.3s ease;
+            box-shadow: 0px 5px 15px rgba(255, 0, 255, 0.6);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            transform: scale(1.05);
+        }
+
+        /* Medals */
+        .gold { background: linear-gradient(135deg, #FFD700, #FFC107) !important; color: black; font-weight: bold; }
+        .silver { background: linear-gradient(135deg, #C0C0C0, #B0B0B0) !important; color: black; font-weight: bold; }
+        .bronze { background: linear-gradient(135deg, #CD7F32, #B87333) !important; color: black; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <h2>🏆 STAGE 2 Scoreboard 🏆</h2>
+
+    <table id="scoreTable">
+        <thead>
+            <tr>
+                <th rowspan="2">🏁 Team</th>
+                <th colspan="5" class="round-header">⚖️ Round 1 - Legal Maze</th>
+                <th colspan="4" class="round-header">🤝 Round 2 - Negotiation Showdown</th>
+                <th rowspan="2">🏆 Grand Total</th>
+                <th rowspan="2">🎯 Bonus</th>
+                <th rowspan="2">🔥 Overall</th>
+            </tr>
+            <tr>
+                <th class="round-border">📖 Reasoning (10)</th>
+                <th class="round-border">🛡️ Defense (10)</th>
+                <th class="round-border">⚖️ Core Issue (10)</th>
+                <th class="round-border">📚 Legal Knowledge (10)</th>
+                <th class="round-border">Total R1</th>
+                <th class="round-border">🤝 Fair Settlement (30)</th>
+                <th class="round-border">⚖️ Legal Reasoning (20)</th>
+                <th class="round-border">🎭 Tactics (10)</th>
+                <th class="round-border">Total R2</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button onclick="updateRankings()">Update Rankings</button>
+
+    <script>
+        let teams = Array.from({ length: 12 }, (_, i) => ({
+            name: `Team ${String.fromCharCode(65 + i)}`,
+            scoresR1: [0, 0, 0, 0],
+            scoresR2: [0, 0, 0],
+            bonus: 0
+        }));
+
+        function createTable() {
+            const tableBody = document.querySelector("#scoreTable tbody");
+            tableBody.innerHTML = "";
+
+            teams.forEach((team, index) => {
+                let totalR1 = team.scoresR1.reduce((a, b) => a + b, 0);
+                let totalR2 = team.scoresR2.reduce((a, b) => a + b, 0);
+                let overallTotal = totalR1 + totalR2 + team.bonus;
+
+                let row = `<tr>
+                    <td>${team.name}</td>
+                    ${team.scoresR1.map((score, i) => `<td><input type="number" min="0" max="10" value="${score}" oninput="updateScore(${index}, 'r1', ${i}, this.value)"></td>`).join("")}
+                    <td>${totalR1}</td>
+                    ${team.scoresR2.map((score, i) => `<td><input type="number" min="0" max="${[30, 20, 10][i]}" value="${score}" oninput="updateScore(${index}, 'r2', ${i}, this.value)"></td>`).join("")}
+                    <td>${totalR2}</td>
+                    <td>${totalR1 + totalR2}</td>
+                    <td><input type="number" value="${team.bonus}" oninput="updateBonus(${index}, this.value)"></td>
+                    <td>${overallTotal}</td>
+                </tr>`;
+
+                tableBody.innerHTML += row;
+            });
+
+            updateColors();
+        }
+
+        function updateScore(teamIndex, round, scoreIndex, value) {
+            teams[teamIndex][round === 'r1' ? 'scoresR1' : 'scoresR2'][scoreIndex] = Number(value);
+            createTable();
+        }
+
+        function updateBonus(teamIndex, value) {
+            teams[teamIndex].bonus = Number(value);
+            createTable();
+        }
+
+        function updateRankings() {
+            teams.sort((a, b) => (b.scoresR1.reduce((x, y) => x + y, 0) + b.scoresR2.reduce((x, y) => x + y, 0) + b.bonus) - 
+                                  (a.scoresR1.reduce((x, y) => x + y, 0) + a.scoresR2.reduce((x, y) => x + y, 0) + a.bonus));
+            createTable();
+        }
+
+        function updateColors() {
+            let rows = document.querySelectorAll("#scoreTable tbody tr");
+            rows[0]?.classList.add("gold");
+            rows[1]?.classList.add("silver");
+            rows[2]?.classList.add("bronze");
+        }
+
+        createTable();
+    </script>
+</body>
+</html>

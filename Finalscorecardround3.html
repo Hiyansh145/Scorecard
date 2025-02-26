@@ -1,0 +1,188 @@
+<!-- Round 3 Scoreboard -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Round 3 Scoreboard 🔥</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            background: radial-gradient(circle, #000428, #004e92);
+            color: white;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 2.8em;
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            padding: 15px 30px;
+            border-radius: 15px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            box-shadow: 0px 5px 20px rgba(255, 0, 255, 0.5);
+        }
+
+        table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(255, 105, 180, 0.4);
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.2em;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .round-header {
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 1.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 3px solid #ff5c00;
+        }
+
+        .round-border {
+            border: 3px solid #ff5c00 !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        td input {
+            width: 60px;
+            text-align: center;
+            font-size: 20px;
+            padding: 6px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        button {
+            margin: 20px;
+            padding: 16px 35px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ff5c00, #ff00ff);
+            color: white;
+            font-weight: bold;
+            transition: 0.3s ease;
+            box-shadow: 0px 5px 15px rgba(255, 0, 255, 0.6);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff00ff, #ff5c00);
+            transform: scale(1.05);
+        }
+
+        /* Medals */
+        .gold { background: linear-gradient(135deg, #FFD700, #FFC107) !important; color: black; font-weight: bold; }
+        .silver { background: linear-gradient(135deg, #C0C0C0, #B0B0B0) !important; color: black; font-weight: bold; }
+        .bronze { background: linear-gradient(135deg, #CD7F32, #B87333) !important; color: black; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <h2>🔥 Round 3 Scoreboard 🔥</h2>
+
+    <table id="scoreboard">
+        <thead>
+            <tr>
+                <th>🏁 Position</th>
+                <th>🏆 Team</th>
+                <th class="round-border">🧠 Logical Reasoning (10)</th>
+                <th class="round-border">🎤 Presentation (10)</th>
+                <th class="round-border">🤝 Teamwork (10)</th>
+                <th class="round-border">📜 Use of Evidence (10)</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button onclick="updateRankings()">Update Rankings</button>
+    <button onclick="localStorage.removeItem('round3_scores'); location.reload();">Reset Scores</button>
+
+    <script>
+        let teams = Array.from({ length: 12 }, (_, i) => ({
+            name: `Team ${String.fromCharCode(65 + i)}`,
+            scores: [0, 0, 0, 0],
+            total: 0
+        }));
+
+        function loadScores() {
+            let savedData = localStorage.getItem("round3_scores");
+            if (savedData) {
+                teams = JSON.parse(savedData);
+            }
+        }
+
+        function saveScores() {
+            localStorage.setItem("round3_scores", JSON.stringify(teams));
+        }
+
+        function updateTotal(index) {
+            let row = document.getElementById(`team-${index}`);
+            let inputs = row.querySelectorAll("input");
+            let total = 0;
+
+            inputs.forEach((input, i) => {
+                teams[index].scores[i] = Number(input.value) || 0;
+                total += teams[index].scores[i];
+            });
+
+            teams[index].total = total;
+            row.querySelector(".total").textContent = total;
+            saveScores();
+            updateRankings();
+        }
+
+        function updateRankings() {
+            teams.sort((a, b) => b.total - a.total);
+
+            let tbody = document.querySelector("#scoreboard tbody");
+            tbody.innerHTML = "";
+
+            teams.forEach((team, i) => {
+                let row = document.createElement("tr");
+                row.id = `team-${i}`;
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${team.name}</td>
+                    ${team.scores.map((score, j) => `<td><input type="number" min="0" max="10" value="${score}" oninput="updateTotal(${i})"></td>`).join("")}
+                    <td class="total">${team.total}</td>
+                `;
+
+                row.className = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+                tbody.appendChild(row);
+            });
+
+            saveScores();
+        }
+
+        loadScores();
+        updateRankings();
+    </script>
+
+</body>
+</html>
