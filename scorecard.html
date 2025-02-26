@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Quiz Scoreboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        table { width: 95%; margin: auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        th { background-color: #4CAF50; color: white; }
+        .gold { background-color: rgb(255, 218, 9); font-weight: bold; }
+        .silver { background-color: rgb(192, 191, 191); font-weight: bold; }
+        .bronze { background-color: #be7e3d; font-weight: bold; }
+        .blue { background-color: rgb(126, 208, 235); font-weight: bold; }
+        input { width: 50px; text-align: center; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        h2{
+            text-align: center;
+            display: inline;
+            border: solid;
+            background-color: #4CAF50;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Live Scoreboard</h2>
+    <br>
+    <br>
+
+    <table id="scoreTable">
+        <thead>
+            <tr>
+                <th rowspan="2">Team Name</th>
+                <th colspan="4">Round 1 Legal Maze</th>
+                <th rowspan="2">Total R1</th>
+                <th colspan="3">Round 2 Negotiation Showdown</th>
+                <th rowspan="2">Total R2</th>
+                <th rowspan="2">Total (R1 + R2)</th>
+                <th rowspan="2">Bonus Round</th>
+                <th rowspan="2">Overall Total</th>
+            </tr>
+            <tr>
+                <th>Reasoning (10)</th>
+                <th>Defending (10)</th>
+                <th>Core Issue (10)</th>
+                <th>Legal Knowledge (10)</th>
+                <th>Fair Settlement (30)</th>
+                <th>Legal Reasoning (20)</th>
+                <th>Tactical Negotiation (10)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button onclick="updateRankings('R1')">Update Round 1</button>
+    <button onclick="updateRankings('R2')">Update Round 2</button>
+    <button onclick="updateRankings('TotalR1R2')">Update Total (R1 + R2)</button>
+    <button onclick="updateRankings('Overall')">Update Overall</button>
+
+    <script>
+        let teams = [
+            { name: "Team A", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team B", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team C", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team D", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team E", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team F", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team G", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team H", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team I", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team J", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team K", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+            { name: "Team L", scoresR1: [0, 0, 0, 0], totalR1: 0, scoresR2: [0, 0, 0], totalR2: 0, totalR1R2: 0, bonus: 0, overallTotal: 0 },
+        ];
+
+        function createTable() {
+            const tableBody = document.querySelector("#scoreTable tbody");
+            tableBody.innerHTML = "";
+
+            teams.forEach((team, teamIndex) => {
+                let tr = document.createElement("tr");
+
+                // Team Name
+                tr.innerHTML = `<td>${team.name}</td>`;
+
+                // Round 1 Inputs
+                team.scoresR1.forEach((score, scoreIndex) => {
+                    tr.innerHTML += `<td><input type="number" min="0" max="10" id="r1-${teamIndex}-${scoreIndex}" value="${score}"></td>`;
+                });
+
+                // Total R1
+                tr.innerHTML += `<td class="total-r1">${team.totalR1}</td>`;
+
+                // Round 2 Inputs
+                team.scoresR2.forEach((score, scoreIndex) => {
+                    tr.innerHTML += `<td><input type="number" min="0" max="${[30, 20, 10][scoreIndex]}" id="r2-${teamIndex}-${scoreIndex}" value="${score}"></td>`;
+                });
+
+                // Total R2
+                tr.innerHTML += `<td class="total-r2">${team.totalR2}</td>`;
+
+                // Total (R1 + R2)
+                tr.innerHTML += `<td class="total-r1r2">${team.totalR1R2}</td>`;
+
+                // Bonus Round
+                tr.innerHTML += `<td><input type="number" min="0" id="bonus-${teamIndex}" value="${team.bonus}"></td>`;
+
+                // Overall Total
+                tr.innerHTML += `<td class="overall-total">${team.overallTotal}</td>`;
+
+                tableBody.appendChild(tr);
+            });
+
+            updateColors();
+        }
+
+        function updateRankings(type) {
+            teams.forEach((team, teamIndex) => {
+                if (type === "R1") {
+                    team.scoresR1 = [0, 1, 2, 3].map(i => Number(document.getElementById(`r1-${teamIndex}-${i}`).value));
+                    team.totalR1 = team.scoresR1.reduce((a, b) => a + b, 0);
+                    teams.sort((a, b) => b.totalR1 - a.totalR1);
+                }
+
+                if (type === "R2") {
+                    team.scoresR2 = [0, 1, 2].map(i => Number(document.getElementById(`r2-${teamIndex}-${i}`).value));
+                    team.totalR2 = team.scoresR2.reduce((a, b) => a + b, 0);
+                }
+
+                if (type === "TotalR1R2") {
+                    team.totalR1R2 = team.totalR1 + team.totalR2;
+                    teams.sort((a, b) => b.totalR1R2 - a.totalR1R2);
+                }
+
+                if (type === "Overall") {
+                    team.bonus = Number(document.getElementById(`bonus-${teamIndex}`).value);
+                    team.overallTotal = team.totalR1R2 + team.bonus;
+                    teams.sort((a, b) => b.overallTotal - a.overallTotal);
+                }
+            });
+
+            createTable();
+        }
+
+        function updateColors() {
+            document.querySelectorAll("#scoreTable tbody tr").forEach((row, index) => {
+                row.className = index === 0 ? "gold" : index === 1 ? "silver" : index === 2 ? "bronze" : "blue";
+            });
+        }
+
+        createTable();
+    </script>
+
+</body>
+</html>
